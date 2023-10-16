@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/tar</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password"/>
+    <property name="hibernate.hbm2ddl.auto">update</property>
+    <property name="hibernate.format_sql">true</property>
+    <mapping class="Personne" package="ma.projet.beans"/>
+    <mapping class="Femme" package="ma.projet.beans"/>
+    <mapping class="Homme" package="ma.projet.beans"/>
+    
+<sql-query name="getNombreEnfants">
+    <![CDATA[
+        SELECT COUNT(*) as nombre_enfants
+        FROM mariages m
+        WHERE m.femme_id = :femmeId
+        AND m.date_debut >= :dateDebut
+        AND m.date_fin <= :dateFin
+    ]]>
+</sql-query>
+-- Dans le fichier de configuration Hibernate (hbm.xml) de la classe Femme, ajoutez la requête nommée.
+<query name="femmesMarieesDeuxFoisOuPlus">
+    <![CDATA[
+        SELECT f.id, f.nom, f.prenom
+        FROM femmes f
+        INNER JOIN mariages m ON f.id = m.femme_id
+        GROUP BY f.id, f.nom, f.prenom
+        HAVING COUNT(m.id) >= 2
+    ]]>
+</query>
+
+
+  </session-factory>
+</hibernate-configuration>
